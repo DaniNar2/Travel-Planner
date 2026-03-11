@@ -1,65 +1,46 @@
-function createPlanning(){
+function savePlanning(){
+    const name = document.getElementById("name").value
+    if(!name){alert("Inserisci un nome");return;}
+    if(!window.selectedDates || window.selectedDates.length==0){alert("Seleziona almeno un giorno");return;}
 
-const name = document.getElementById("name").value
-const arrival = new Date(document.getElementById("arrival").value)
-const departure = new Date(document.getElementById("departure").value)
+    let schedule = {}
 
-let schedule = []
+    let maxHours = 0
+    window.selectedDates.forEach(d=>{
+        let arrH = parseInt(d.arrival.split(":")[0])
+        let arrM = parseInt(d.arrival.split(":")[1])
+        let depH = parseInt(d.departure.split(":")[0])
+        let depM = parseInt(d.departure.split(":")[1])
 
-let current = new Date(arrival)
+        let slots = []
+        for(let h=arrH; h<=depH; h++){
+            slots.push({time: (h<10?"0"+h:h)+":00", activity:""})
+        }
+        if(slots.length>maxHours) maxHours=slots.length
+        schedule[d.date] = {slots:slots, arrivalH: arrH, departureH: depH}
+    })
 
-while(current < departure){
+    // allineiamo tutte le giornate alla stessa lunghezza (celle sbarrate per ore non disponibili)
+    Object.keys(schedule).forEach(day=>{
+        let s = schedule[day]
+        while(s.slots.length<maxHours){
+            s.slots.push({time:"-", activity:"", disabled:true})
+        }
+    })
 
-schedule.push({
-time: current.toLocaleString(),
-activity: ""
-})
+    let plannings = getPlannings()
+    plannings.push({
+        id:Date.now(),
+        name:name,
+        arrival:window.selectedDates[0].date,
+        departure:window.selectedDates[window.selectedDates.length-1].date,
+        schedule:schedule,
+        places:[],
+        food:[],
+        transport:[]
+    })
 
-current.setHours(current.getHours()+1)
-}
-
-displaySchedule(schedule)
-
-savePlanning(name,arrival,departure,schedule)
-}
-
-function displaySchedule(schedule){
-
-let html="<table>"
-html+="<tr><th>Orario</th><th>Attività</th></tr>"
-
-schedule.forEach((slot,i)=>{
-
-html+=`
-<tr>
-<td>${slot.time}</td>
-<td contenteditable="true"></td>
-</tr>
-`
-})
-
-html+="</table>"
-
-document.getElementById("schedule").innerHTML=html
-}
-
-function savePlanning(name,arrival,departure,schedule){
-
-let plannings=getPlannings()
-
-let planning={
-id:Date.now(),
-name:name,
-arrival:arrival,
-departure:departure,
-schedule:schedule,
-places:[],
-food:[],
-transport:[]
-}
-
-plannings.push(planning)
-
-savePlannings(plannings)
-
+    savePlannings(plannings)
+    alert("Planning creato!")
+    window.location.href="index.html"
 }

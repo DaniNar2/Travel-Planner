@@ -1,36 +1,22 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-<title>Crea Planning</title>
-<link rel="stylesheet" href="css/style.css">
+    <title>Crea Planning</title>
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 
-<h2>Crea Planning</h2>
-
+<h2>Crea nuovo planning</h2>
 <label>Nome planning</label>
-<input id="name">
+<input id="name" placeholder="Nome città o progetto">
+<div id="calendar"></div>
+<button onclick="savePlanning()">Crea planning</button>
 
-<br>
-
-<label>Arrivo</label>
-<input type="datetime-local" id="arrival">
-
-<br>
-
-<label>Partenza</label>
-<input type="datetime-local" id="departure">
-
-<br>
-
-<button onclick="createPlanning()">Crea planning</button>
-
-<div id="schedule"></div>
-
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/planner.js"></script>
+<script src="js/calendar.js"></script>
 
 </body>
 </html>
