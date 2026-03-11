@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Crea Planning</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<h2>Crea Planning</h2>
+
+<label>Nome planning</label>
+<input id="name">
+
+<br>
+
+<label>Arrivo</label>
+<input type="datetime-local" id="arrival">
+
+<br>
+
+<label>Partenza</label>
+<input type="datetime-local" id="departure">
+
+<br>
+
+<button onclick="createPlanning()">Crea planning</button>
+
+<div id="schedule"></div>
+
+<script src="js/storage.js"></script>
+<script src="js/planner.js"></script>
+
+</body>
+</html>

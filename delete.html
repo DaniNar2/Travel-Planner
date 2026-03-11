@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Elimina planning</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<h2>Elimina planning</h2>
+
+<div id="list"></div>
+
+<script src="js/storage.js"></script>
+
+<script>
+
+let plannings=getPlannings()
+
+let html=""
+
+plannings.forEach((p,i)=>{
+
+html+=`
+<p>${p.name}
+<button onclick="remove(${i})">Elimina</button>
+</p>
+`
+})
+
+document.getElementById("list").innerHTML=html
+
+function remove(i){
+
+let plannings=getPlannings()
+
+plannings.splice(i,1)
+
+savePlannings(plannings)
+
+location.reload()
+
+}
+
+</script>
+
+</body>
+</html>

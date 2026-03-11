@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Modifica Planning</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<h2>Modifica planning</h2>
+
+<div id="planningList"></div>
+
+<div id="editor"></div>
+
+<button onclick="saveChanges()">Salva modifiche</button>
+
+<script src="js/storage.js"></script>
+
+<script>
+
+let plannings = getPlannings()
+let currentIndex = null
+
+let html=""
+
+plannings.forEach((p,i)=>{
+
+html += `
+<p>
+<b>${p.name}</b>
+<button onclick="openPlanning(${i})">Apri</button>
+</p>
+`
+
+})
+
+document.getElementById("planningList").innerHTML = html
+
+
+function openPlanning(index){
+
+currentIndex = index
+
+let planning = plannings[index]
+
+let table = "<h3>"+planning.name+"</h3>"
+table += "<table>"
+table += "<tr><th>Orario</th><th>Attività</th></tr>"
+
+planning.schedule.forEach((slot,i)=>{
+
+table += `
+<tr>
+<td>${slot.time}</td>
+<td contenteditable="true" id="activity${i}">
+${slot.activity}
+</td>
+</tr>
+`
+
+})
+
+table += "</table>"
+
+document.getElementById("editor").innerHTML = table
+
+}
+
+
+function saveChanges(){
+
+if(currentIndex == null){
+alert("Seleziona prima un planning")
+return
+}
+
+let planning = plannings[currentIndex]
+
+planning.schedule.forEach((slot,i)=>{
+
+let text = document.getElementById("activity"+i).innerText
+slot.activity = text
+
+})
+
+savePlannings(plannings)
+
+alert("Planning aggiornato!")
+
+}
+
+</script>
+
+</body>
+</html>
