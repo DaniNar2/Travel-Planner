@@ -8,12 +8,79 @@
 
 <body>
 
+<header>
+
 <h1>Travel Planner</h1>
 
-<a href="create.html"><button>Crea planning</button></a>
-<a href="view.html"><button>Vedi planning</button></a>
-<a href="edit.html"><button>Modifica planning</button></a>
-<a href="delete.html"><button>Elimina planning</button></a>
+<a href="create.html" class="newBtn">
+＋ New
+</a>
+
+</header>
+
+<div id="planningGrid"></div>
+
+<script src="js/storage.js"></script>
+
+<script>
+
+let plannings = getPlannings()
+
+let html = ""
+
+plannings.forEach((p,i)=>{
+
+html += `
+<div class="card">
+
+<div class="cardText">
+
+<h3>${p.name}</h3>
+<p>${new Date(p.arrival).toLocaleString()}</p>
+<p>${new Date(p.departure).toLocaleString()}</p>
+
+</div>
+
+<div class="icons">
+
+<span onclick="editPlanning(${i})">✏️</span>
+<span onclick="deletePlanning(${i})">🗑️</span>
+
+</div>
+
+</div>
+`
+})
+
+document.getElementById("planningGrid").innerHTML = html
+
+
+function editPlanning(i){
+
+localStorage.setItem("editIndex", i)
+
+window.location.href="edit.html"
+
+}
+
+
+function deletePlanning(i){
+
+let plannings = getPlannings()
+
+if(confirm("Vuoi eliminare questo planning?")){
+
+plannings.splice(i,1)
+
+savePlannings(plannings)
+
+location.reload()
+
+}
+
+}
+
+</script>
 
 </body>
 </html>

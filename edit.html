@@ -10,8 +10,6 @@
 
 <h2>Modifica planning</h2>
 
-<div id="planningList"></div>
-
 <div id="editor"></div>
 
 <button onclick="saveChanges()">Salva modifiche</button>
@@ -21,22 +19,10 @@
 <script>
 
 let plannings = getPlannings()
-let currentIndex = null
 
-let html=""
+let currentIndex = localStorage.getItem("editIndex")
 
-plannings.forEach((p,i)=>{
-
-html += `
-<p>
-<b>${p.name}</b>
-<button onclick="openPlanning(${i})">Apri</button>
-</p>
-`
-
-})
-
-document.getElementById("planningList").innerHTML = html
+openPlanning(currentIndex)
 
 
 function openPlanning(index){
@@ -70,11 +56,6 @@ document.getElementById("editor").innerHTML = table
 
 
 function saveChanges(){
-
-if(currentIndex == null){
-alert("Seleziona prima un planning")
-return
-}
 
 let planning = plannings[currentIndex]
 
