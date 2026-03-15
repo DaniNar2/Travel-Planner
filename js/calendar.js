@@ -1,28 +1,32 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const calendarEl = document.getElementById('calendar');
+document.addEventListener("DOMContentLoaded", function () {
 
-    // Array globale dei giorni selezionati
-    window.selectedDates = [];
+let calendarEl = document.getElementById("calendar")
 
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        selectable: true,
-        select: function(info) {
-            // Prendi i valori dagli input time
-            const arrival = document.getElementById('arrivalTime').value;
-            const departure = document.getElementById('departureTime').value;
+window.selectedDates = []
 
-            // Aggiungi la data selezionata all'array
-            window.selectedDates.push({
-                date: info.startStr,
-                arrival: arrival,
-                departure: departure
-            });
+let calendar = new FullCalendar.Calendar(calendarEl, {
 
-            // Notifica visiva
-            alert(`Giorno aggiunto: ${info.startStr} dalle ${arrival} alle ${departure}`);
-        }
-    });
+initialView: "dayGridMonth",
 
-    calendar.render();
-});
+selectable: true,
+
+dateClick: function(info){
+
+let arrival = document.getElementById("arrivalTime").value
+let departure = document.getElementById("departureTime").value
+
+window.selectedDates.push({
+date: info.dateStr,
+arrival: arrival,
+departure: departure
+})
+
+alert("Giorno aggiunto: " + info.dateStr)
+
+}
+
+})
+
+calendar.render()
+
+})

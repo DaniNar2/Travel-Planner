@@ -1,45 +1,45 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Crea Planning</title>
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet"/>
-    <link rel="stylesheet" href="css/style.css">
-    <style>
-        #calendar {
-            max-width: 900px;
-            margin: 20px auto;
-            height: 500px;
-        }
-        .time-inputs {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        .time-inputs input {
-            width: 100px;
-            padding: 5px;
-        }
-    </style>
+<title>Crea Planning</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
+
+<style>
+#calendar{
+max-width:900px;
+margin:40px auto;
+}
+</style>
+
 </head>
+
 <body>
 
-<h2>Crea nuovo planning</h2>
+<h1>Crea nuovo planning</h1>
+
 <label>Nome planning</label>
 <input id="name" placeholder="Nome città o progetto">
 
 <div id="calendar"></div>
 
-<div class="time-inputs">
-    <label>Ora arrivo:</label>
-    <input type="time" id="arrivalTime" value="10:00">
-    <label>Ora partenza:</label>
-    <input type="time" id="departureTime" value="18:00">
+<div style="text-align:center;margin-top:20px;">
+Ora arrivo:
+<input type="time" id="arrivalTime" value="10:00">
+
+Ora partenza:
+<input type="time" id="departureTime" value="18:00">
 </div>
 
+<div style="text-align:center;margin-top:20px;">
 <button onclick="savePlanning()">Crea planning</button>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
+
 <script src="js/storage.js"></script>
 <script src="js/planner.js"></script>
 <script src="js/calendar.js"></script>
