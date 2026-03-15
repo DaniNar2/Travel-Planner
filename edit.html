@@ -52,7 +52,12 @@ function renderSchedule(){
             let s = schedule[days[j]].slots[i]
             if(j==0) hour = s.time
             if(s.disabled){html+=`<td class="cell-disabled">---</td>`}
-            else html+=`<td contenteditable="true" id="cell-${days[j]}-${i}">${s.activity}</td>`
+            else html+=`<td 
+            contenteditable="true" 
+            id="cell-${days[j]}-${i}"
+            ondrop="drop(event)"
+            ondragover="allowDrop(event)"
+            >${s.activity}</td>`
         }
         html+="</tr>"
     }

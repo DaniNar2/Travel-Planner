@@ -1,48 +1,86 @@
 function savePlanning(){
-    const name = document.getElementById("name").value;
-    if(!name){ alert("Inserisci un nome"); return; }
-    if(!window.selectedDates || window.selectedDates.length==0){ alert("Seleziona almeno un giorno"); return; }
 
-    let schedule = {};
-    let maxHours = 0;
+const name = document.getElementById("name").value
+const arrivalDate = document.getElementById("arrivalDate").value
+const departureDate = document.getElementById("departureDate").value
+const arrivalTime = document.getElementById("arrivalTime").value
+const departureTime = document.getElementById("departureTime").value
 
-    // calcolo degli slot per ogni giorno
-    window.selectedDates.forEach(d=>{
-        const [arrH, arrM] = d.arrival.split(":").map(Number);
-        const [depH, depM] = d.departure.split(":").map(Number);
+if(!name){ alert("Inserisci un nome"); return }
+if(!arrivalDate || !departureDate){ alert("Inserisci le date"); return }
 
-        let slots = [];
-        for(let h=arrH; h<=depH; h++){
-            slots.push({time: (h<10?"0"+h:h)+":00", activity:""});
-        }
+let schedule = {}
 
-        if(slots.length > maxHours) maxHours = slots.length;
+let start = new Date(arrivalDate)
+let end = new Date(departureDate)
 
-        schedule[d.date] = {slots: slots, arrivalH: arrH, departureH: depH};
-    });
+let maxHours = 0
 
-    // allineamento giorni con celle sbarrate
-    Object.keys(schedule).forEach(day=>{
-        let s = schedule[day];
-        while(s.slots.length < maxHours){
-            s.slots.push({time:"-", activity:"", disabled:true});
-        }
-    });
+while(start <= end){
 
-    // salva il planning nel localStorage
-    const plannings = getPlannings();
-    plannings.push({
-        id: Date.now(),
-        name: name,
-        arrival: window.selectedDates[0].date,
-        departure: window.selectedDates[window.selectedDates.length-1].date,
-        schedule: schedule,
-        places: [],
-        food: [],
-        transport: []
-    });
+let day = start.toISOString().split("T")[0]
 
-    savePlannings(plannings);
-    alert("Planning creato!");
-    window.location.href = "index.html";
+let arrH = parseInt(arrivalTime.split(":")[0])
+let depH = parseInt(departureTime.split(":")[0])
+
+let slots=[]
+
+for(let h=arrH; h<=depH; h++){
+
+slots.push({
+time:(h<10?"0"+h:h)+":00",
+activity:""
+})
+
+}
+
+if(slots.length>maxHours) maxHours=slots.length
+
+schedule[day]={
+slots:slots,
+arrivalH:arrH,
+departureH:depH
+}
+
+start.setDate(start.getDate()+1)
+
+}
+
+Object.keys(schedule).forEach(day=>{
+
+let s=schedule[day]
+
+while(s.slots.length<maxHours){
+
+s.slots.push({
+time:"-",
+activity:"",
+disabled:true
+})
+
+}
+
+})
+
+const plannings=getPlannings()
+
+plannings.push({
+
+id:Date.now(),
+name:name,
+arrival:arrivalDate,
+departure:departureDate,
+schedule:schedule,
+places:[],
+food:[],
+transport:[]
+
+})
+
+savePlannings(plannings)
+
+alert("Planning creato!")
+
+window.location.href="index.html"
+
 }
