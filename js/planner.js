@@ -6,8 +6,15 @@ const departureDate = document.getElementById("departureDate").value
 const arrivalTime = document.getElementById("arrivalTime").value
 const departureTime = document.getElementById("departureTime").value
 
-if(!name){ alert("Inserisci un nome"); return }
-if(!arrivalDate || !departureDate){ alert("Inserisci le date"); return }
+if(!name){
+alert("Inserisci un nome")
+return
+}
+
+if(!arrivalDate || !departureDate){
+alert("Inserisci le date")
+return
+}
 
 let schedule = {}
 
