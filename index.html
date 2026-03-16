@@ -1,21 +1,15 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 <title>Travel Planner</title>
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/index.css">
 </head>
 
 <body>
 
 <header>
-
 <h1>Travel Planner</h1>
-
-<a href="create.html" class="newBtn">
-＋ New
-</a>
-
+<a href="creator.html" class="newBtn">＋ New</a>
 </header>
 
 <div id="planningGrid"></div>
@@ -25,44 +19,45 @@
 <script>
 
 let plannings = getPlannings()
-
 let html = ""
 
 plannings.forEach((p,i)=>{
 
 html += `
 <div class="card">
-
-<div class="cardText">
-
-<h3>${p.name}</h3>
-<p>${new Date(p.arrival).toLocaleString()}</p>
-<p>${new Date(p.departure).toLocaleString()}</p>
-
-</div>
-
-<div class="icons">
-
-<span onclick="editPlanning(${i})">✏️</span>
-<span onclick="deletePlanning(${i})">🗑️</span>
-
-</div>
-
+  <div class="cardText">
+    <h3>${p.name}</h3>
+    <p class="datetime">Arrival: ${new Date(p.arrival).toLocaleDateString()} ${new Date(p.arrival).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+    <p class="datetime">Departure: ${new Date(p.departure).toLocaleDateString()} ${new Date(p.departure).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p> 
+  </div>
+  <div class="icons">
+    <span onclick="viewPlanning(${i})">👁️</span>
+    <span onclick="editPlanning(${i})">✏️</span>
+    <span onclick="deletePlanning(${i})">🗑️</span>
+  </div>
 </div>
 `
 })
 
 document.getElementById("planningGrid").innerHTML = html
 
+function viewPlanning(i){
 
-function editPlanning(i){
+localStorage.setItem("currentPlanning", i)
+localStorage.setItem("mode", "view")
 
-localStorage.setItem("editIndex", i)
-
-window.location.href="edit.html"
+window.location.href="planning.html"
 
 }
 
+function editPlanning(i){
+
+localStorage.setItem("currentPlanning", i)
+localStorage.setItem("mode", "edit")
+
+window.location.href="planning.html"
+
+}
 
 function deletePlanning(i){
 
@@ -71,7 +66,6 @@ let plannings = getPlannings()
 if(confirm("Vuoi eliminare questo planning?")){
 
 plannings.splice(i,1)
-
 savePlannings(plannings)
 
 location.reload()

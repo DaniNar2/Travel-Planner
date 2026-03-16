@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Create Planning</title>
+<link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+
+<h1>Create Planning</h1>
+
+<div>
+<label>Planning Name</label><br>
+<input type="text" id="name">
+</div>
+
+<div>
+<label>Arrival</label><br>
+<input type="datetime-local" id="arrival">
+</div>
+
+<div>
+<label>Departure</label><br>
+<input type="datetime-local" id="departure">
+</div>
+
+<br>
+<button onclick="createPlanning()">Create Planning</button>
+
+<script src="js/storage.js"></script>
+
+<script>
+
+function createPlanning(){
+
+let name = document.getElementById("name").value
+let arrival = document.getElementById("arrival").value
+let departure = document.getElementById("departure").value
+
+let plannings = getPlannings()
+
+let planning = {
+name:name,
+arrival:arrival,
+departure:departure
+}
+
+plannings.push(planning)
+
+savePlannings(plannings)
+
+/* salva indice dell'ultimo planning creato */
+localStorage.setItem("currentPlanning", plannings.length-1)
+localStorage.setItem("mode", "edit")
+
+/* vai alla pagina planning */
+
+window.location.href="planning.html"
+
+}
+
+</script>
+
+</body>
+</html>

@@ -1,17 +1,153 @@
-<h2>Attività del viaggio</h2>
+<!DOCTYPE html>
+<html>
+<head>
+<title>Planning</title>
+<link rel="stylesheet" href="css/planning.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
 
-<div id="cardCreator">
+<body>
 
-<input id="cardTitle" placeholder="Nome attività">
+<header>
+<h1 id="title"></h1>
+<a href="index.html" class="backBtn">← Back</a>
+</header>
 
-<select id="cardType">
-<option value="see">Cosa vedere</option>
-<option value="food">Cosa mangiare</option>
-<option value="transport">Trasporti</option>
-</select>
-
-<button onclick="createCard()">Crea tessera</button>
-
+<div style="margin: 10px 20px;">
+  <button id="downloadBtn" class="downloadBtn">Download PDF</button>
 </div>
 
-<div id="cardsContainer"></div>
+<div class="tableWrapper">
+<div id="tableContainer"></div>
+</div>
+
+<script src="js/storage.js"></script>
+
+<script>
+
+/* RECUPERO DATI */
+let plannings = getPlannings()
+let index = localStorage.getItem("currentPlanning")
+let mode = localStorage.getItem("mode") || "edit"
+let planning = plannings[index]
+
+// sicurezza se nessun planning selezionato
+if(!planning){
+  window.location.href = "index.html"
+}
+
+document.getElementById("title").innerText = planning.name
+document.getElementById("title").innerText += mode === "view" ? " (View mode)" : " (Edit mode)"
+
+/* STRUTTURA CELLE SE NON ESISTE */
+if(!planning.cells){
+  planning.cells = {}
+}
+
+/* DATE */
+let arrival = new Date(planning.arrival)
+let departure = new Date(planning.departure)
+let days = []
+let current = new Date(arrival)
+while(current <= departure){
+  days.push(new Date(current))
+  current.setDate(current.getDate()+1)
+}
+
+/* COSTRUZIONE TABELLA */
+let html = "<table class='planner'>"
+
+// HEADER
+html += "<thead><tr>"
+html += "<th class='hourCol'>Hour</th>"
+days.forEach(d=>{
+  html += `<th>${d.toLocaleDateString()}</th>`
+})
+html += "</tr></thead>"
+
+// BODY
+html += "<tbody>"
+for(let h=0; h<24; h++){
+  html += "<tr>"
+  html += `<td class="hourCol">${h}:00</td>`
+  days.forEach((d,i)=>{
+    let editable = mode === "edit" ? "true" : "false"
+    html += `<td class="cell" data-day="${i}" data-hour="${h}" contenteditable="${editable}"></td>`
+  })
+  html += "</tr>"
+}
+html += "</tbody></table>"
+
+// INSERIMENTO NEL DOM
+document.getElementById("tableContainer").innerHTML = html
+
+/* CARICAMENTO DATI SALVATI */
+document.querySelectorAll(".cell").forEach(cell=>{
+  let day = cell.dataset.day
+  let hour = cell.dataset.hour
+  let key = day + "-" + hour
+
+  if(planning.cells[key]){
+    cell.innerText = planning.cells[key].text
+    cell.style.backgroundColor = planning.cells[key].color
+  }
+
+  // SALVATAGGIO TESTO AUTOMATICO
+  cell.addEventListener("input", function(){
+    if(mode === "view") return
+    let key = this.dataset.day + "-" + this.dataset.hour
+    planning.cells[key] = { text: this.innerText, color: this.style.backgroundColor }
+    savePlannings(plannings)
+  })
+
+  // COLORAZIONE CELLE
+  cell.addEventListener("dblclick", function(){
+    if(mode === "view") return
+    if(this.style.backgroundColor){
+      this.style.backgroundColor=""
+    } else{
+      this.style.backgroundColor="#d0ebff"
+    }
+    let key = this.dataset.day + "-" + this.dataset.hour
+    planning.cells[key] = { text:this.innerText, color:this.style.backgroundColor }
+    savePlannings(plannings)
+  })
+})
+
+/* DOWNLOAD PDF */
+document.getElementById("downloadBtn").addEventListener("click", function(){
+
+  const tableWrapper = document.querySelector(".tableWrapper")
+
+  // salviamo altezza e larghezza originali
+  const originalWidth = tableWrapper.style.width
+  const originalHeight = tableWrapper.style.height
+  const originalOverflow = tableWrapper.style.overflow
+
+  // rendiamo la tabella visibile tutta per html2canvas
+  tableWrapper.style.width = tableWrapper.scrollWidth + "px"
+  tableWrapper.style.height = tableWrapper.scrollHeight + "px"
+  tableWrapper.style.overflow = "visible"
+
+  html2canvas(tableWrapper, { scale: 2, useCORS: true }).then(canvas => {
+    const imgData = canvas.toDataURL("image/png")
+    
+    // PDF landscape
+    const pdf = new jspdf.jsPDF("l", "pt", [canvas.width, canvas.height])
+    pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height)
+    pdf.save(`${planning.name}.pdf`)
+
+    // Ripristiniamo lo stile originale
+    tableWrapper.style.width = originalWidth
+    tableWrapper.style.height = originalHeight
+    tableWrapper.style.overflow = originalOverflow
+
+  })
+
+})
+
+</script>
+
+</body>
+</html>
