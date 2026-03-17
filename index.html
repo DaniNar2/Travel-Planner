@@ -9,7 +9,11 @@
 
 <header>
 <h1>Travel Planner</h1>
-<a href="creator.html" class="newBtn">＋ New</a>
+<div>
+  <a href="creator.html" class="newBtn">＋ New</a>
+  <a href="planning.html" class="newBtn">§ Join</a>
+</div>
+
 </header>
 
 <div id="planningGrid"></div>
@@ -27,9 +31,18 @@ html += `
 <div class="card">
   <div class="cardText">
     <h3>${p.name}</h3>
-    <p class="datetime">Arrival: ${new Date(p.arrival).toLocaleDateString()} ${new Date(p.arrival).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
-    <p class="datetime">Departure: ${new Date(p.departure).toLocaleDateString()} ${new Date(p.departure).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p> 
+
+    <p class="datetime">
+      Arrival: 
+      ${new Date(p.arrival).toLocaleDateString()} - ${p.arrivalTime || "--:--"}
+    </p>
+    <p class="datetime">
+      Departure: 
+      ${new Date(p.departure).toLocaleDateString()} - ${p.departureTime || "--:--"}
+    </p> 
+
   </div>
+
   <div class="icons">
     <span onclick="viewPlanning(${i})">👁️</span>
     <span onclick="editPlanning(${i})">✏️</span>

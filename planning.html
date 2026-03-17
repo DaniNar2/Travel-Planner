@@ -32,7 +32,6 @@ let index = localStorage.getItem("currentPlanning")
 let mode = localStorage.getItem("mode") || "edit"
 let planning = plannings[index]
 
-// sicurezza se nessun planning selezionato
 if(!planning){
   window.location.href = "index.html"
 }
@@ -40,16 +39,25 @@ if(!planning){
 document.getElementById("title").innerText = planning.name
 document.getElementById("title").innerText += mode === "view" ? " (View mode)" : " (Edit mode)"
 
-/* STRUTTURA CELLE SE NON ESISTE */
+/* STRUTTURA CELLE */
 if(!planning.cells){
   planning.cells = {}
 }
+
+/* FUNZIONE ORARIO (gestisce minuti) */
+function getHour(timeString){
+  return Math.floor(parseInt(timeString.split(":")[0]))
+}
+
+let arrivalHour = planning.arrivalTime ? getHour(planning.arrivalTime) : null
+let departureHour = planning.departureTime ? getHour(planning.departureTime) : null
 
 /* DATE */
 let arrival = new Date(planning.arrival)
 let departure = new Date(planning.departure)
 let days = []
 let current = new Date(arrival)
+
 while(current <= departure){
   days.push(new Date(current))
   current.setDate(current.getDate()+1)
@@ -58,7 +66,7 @@ while(current <= departure){
 /* COSTRUZIONE TABELLA */
 let html = "<table class='planner'>"
 
-// HEADER
+/* HEADER */
 html += "<thead><tr>"
 html += "<th class='hourCol'>Hour</th>"
 days.forEach(d=>{
@@ -66,49 +74,78 @@ days.forEach(d=>{
 })
 html += "</tr></thead>"
 
-// BODY
+/* BODY */
 html += "<tbody>"
-for(let h=0; h<24; h++){
+for(let h=6; h<24; h++){
   html += "<tr>"
-  html += `<td class="hourCol">${h}:00</td>`
+  html += `<td class="hourCol">${h}:00-${h+1}:00</td>`
+
   days.forEach((d,i)=>{
-    let editable = mode === "edit" ? "true" : "false"
-    html += `<td class="cell" data-day="${i}" data-hour="${h}" contenteditable="${editable}"></td>`
+
+    let isBlocked = false
+
+    // Giorno arrivo → prima dell'arrivo
+    if(i === 0 && arrivalHour !== null && h < arrivalHour){
+      isBlocked = true
+    }
+
+    // Giorno partenza → dalla partenza in poi
+    if(i === days.length - 1 && departureHour !== null && h >= departureHour){
+      isBlocked = true
+    }
+
+    let editable = (mode === "edit" && !isBlocked) ? "true" : "false"
+    let content = isBlocked ? "✈️" : ""
+
+    html += `
+      <td class="cell ${isBlocked ? "blocked" : ""}" 
+          data-day="${i}" 
+          data-hour="${h}" 
+          contenteditable="${editable}">
+          ${content}
+      </td>
+    `
   })
+
   html += "</tr>"
 }
 html += "</tbody></table>"
 
-// INSERIMENTO NEL DOM
+/* INSERIMENTO */
 document.getElementById("tableContainer").innerHTML = html
 
-/* CARICAMENTO DATI SALVATI */
+/* CARICAMENTO DATI */
 document.querySelectorAll(".cell").forEach(cell=>{
+
   let day = cell.dataset.day
   let hour = cell.dataset.hour
   let key = day + "-" + hour
 
-  if(planning.cells[key]){
+  // NON sovrascrivere celle bloccate
+  if(planning.cells[key] && !cell.classList.contains("blocked")){
     cell.innerText = planning.cells[key].text
     cell.style.backgroundColor = planning.cells[key].color
   }
 
-  // SALVATAGGIO TESTO AUTOMATICO
+  /* SALVATAGGIO TESTO */
   cell.addEventListener("input", function(){
-    if(mode === "view") return
+    if(mode === "view" || this.classList.contains("blocked")) return
+
     let key = this.dataset.day + "-" + this.dataset.hour
     planning.cells[key] = { text: this.innerText, color: this.style.backgroundColor }
     savePlannings(plannings)
   })
 
-  // COLORAZIONE CELLE
+  /* COLORAZIONE */
   cell.addEventListener("dblclick", function(){
-    if(mode === "view") return
+    if(mode === "view" || this.classList.contains("blocked")) return
+
     if(this.style.backgroundColor){
       this.style.backgroundColor=""
     } else{
       this.style.backgroundColor="#d0ebff"
     }
+
     let key = this.dataset.day + "-" + this.dataset.hour
     planning.cells[key] = { text:this.innerText, color:this.style.backgroundColor }
     savePlannings(plannings)
@@ -120,12 +157,10 @@ document.getElementById("downloadBtn").addEventListener("click", function(){
 
   const tableWrapper = document.querySelector(".tableWrapper")
 
-  // salviamo altezza e larghezza originali
   const originalWidth = tableWrapper.style.width
   const originalHeight = tableWrapper.style.height
   const originalOverflow = tableWrapper.style.overflow
 
-  // rendiamo la tabella visibile tutta per html2canvas
   tableWrapper.style.width = tableWrapper.scrollWidth + "px"
   tableWrapper.style.height = tableWrapper.scrollHeight + "px"
   tableWrapper.style.overflow = "visible"
@@ -133,16 +168,13 @@ document.getElementById("downloadBtn").addEventListener("click", function(){
   html2canvas(tableWrapper, { scale: 2, useCORS: true }).then(canvas => {
     const imgData = canvas.toDataURL("image/png")
     
-    // PDF landscape
     const pdf = new jspdf.jsPDF("l", "pt", [canvas.width, canvas.height])
     pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height)
     pdf.save(`${planning.name}.pdf`)
 
-    // Ripristiniamo lo stile originale
     tableWrapper.style.width = originalWidth
     tableWrapper.style.height = originalHeight
     tableWrapper.style.overflow = originalOverflow
-
   })
 
 })
